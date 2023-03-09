@@ -39,11 +39,11 @@ class InOutOutputTest {
 	
 	@Test
 //	@Disabled
-	void printDirectoryFileTest() {
-		printDirectoryFile("", 1);
+	void printDirectoryFileTest() throws IOException {
+		printDirectoryFile("", 2);
 	}
 
-	void printDirectoryFile(String path, int maxLevel) {
+	void printDirectoryFile(String path, int maxLevel) throws IOException {
 		//path - directory path
 		//maxLevel - maximal level of printing, if maxLevel < 1 - prints all levels, 1 - current folder
 		//output format
@@ -51,13 +51,15 @@ class InOutOutputTest {
 		// 		<childsName> - dir | file
 		// 			<childsName> - dir | file
 		// 		<childsName> - dir | file
-		File directory = new File(path);
-		directory = directory.getAbsoluteFile();
-		System.out.println(directory.getName());
-		if (maxLevel < 1) {
-			maxLevel = -1;
+		File directory = new File(path).getAbsoluteFile();
+		if (directory.isDirectory()) {
+			
+			System.out.println(directory.getName());
+			if (maxLevel < 1) {
+				maxLevel = -1;
+			}
+			printChilds(directory, maxLevel, LEVEL_OFFSET);
 		}
-		printChilds(directory, maxLevel, LEVEL_OFFSET);
 	}
 	
 	private void printChilds(File directory, int nextLevel, int offset) {
@@ -83,10 +85,9 @@ class InOutOutputTest {
 	}
 	
 	@Test
+//	@Disabled
 	void printDirectoryFilesTest() throws IOException {
-		Path directory = Path.of("");
-		System.out.println(directory.toAbsolutePath().getFileName());
-		printDirectoryFiles(directory.toString(), 1);
+		printDirectoryFiles("", 2);
 	}
 
 	void printDirectoryFiles(String path, int maxLevel) throws IOException {
@@ -97,7 +98,9 @@ class InOutOutputTest {
 		// 		<childsName> - dir | file
 		// 			<childsName> - dir | file
 		// 		<childsName> - dir | file
+
 		Path directory = Path.of(path);
+		System.out.println(directory.toAbsolutePath().getFileName());
 		if (maxLevel < 1) {
 			maxLevel = Integer.MAX_VALUE;
 		}
