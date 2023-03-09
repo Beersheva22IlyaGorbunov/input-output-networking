@@ -11,7 +11,7 @@ public class TransferCopyApplication {
 			Copy copy = new FilesCopyBuilder().build(TRANSFER_COPY, args);
 			copy.copyRun();
 		} catch (Exception e) {
-			System.out.println(e.getLocalizedMessage());
+			System.out.println(e.getMessage());
 		}
 	}
 }

@@ -10,8 +10,8 @@ public class FilesCopyApplication {
 		try {
 			Copy copy = new FilesCopyBuilder().build(FILES_COPY, args);
 			copy.copyRun();
-		} catch (Exception e1) {
-			System.out.println(e1.getLocalizedMessage());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 }

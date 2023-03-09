@@ -10,8 +10,8 @@ public class BufferCopyAplication {
 		try {
 			Copy copy = new FilesCopyBuilder().build(BUFFER_COPY, args);
 			copy.copyRun();
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
