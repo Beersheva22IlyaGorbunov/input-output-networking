@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import telran.io.Copy.Stopwatch;
-
 public class TransferCopy extends Copy {
 
 	TransferCopy(String srcFilePath, String destFilePath, boolean overwrite) {
