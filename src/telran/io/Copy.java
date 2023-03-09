@@ -1,10 +1,10 @@
 package telran.io;
 
-import java.io.IOException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
-import java.time.LocalDateTime;
-
-import telran.io.Copy.Stopwatch;
+import java.time.Instant;
 
 public abstract class Copy {
 	String srcFilePath;
@@ -17,30 +17,50 @@ public abstract class Copy {
 		this.overwrite = overwrite;
 	}
 	
-	public abstract long copy() throws IOException;
+	public abstract long copy();
 	
 	public abstract DisplayResult getDisplayResult(long copyTime, long fileSize);
 	
-	public void copyRun() throws IOException {
-		System.out.println("Start copying");
-		Stopwatch stopwatch = new Stopwatch();
+	public void copyRun() {
+		try {
+			canOverwrite();
+			sourceExists();
+			System.out.println("Start copying");
+			Stopwatch stopwatch = new Stopwatch();
+			
+			long fileSize = copy();
+			long copyTime = stopwatch.getDelta();
+			
+			System.out.println("Copying succesfully finished");
+			System.out.println(getDisplayResult(copyTime, fileSize).toString());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 		
-		long fileSize = copy();
-		long copyTime = stopwatch.getDelta();
-		
-		System.out.println("Copying succesfully finished");
-		System.out.println(getDisplayResult(copyTime, fileSize).toString());
 	}
 	
+	private void sourceExists() throws Exception {
+		if (!Files.exists(Path.of(srcFilePath))) {
+			throw new Exception("Incorrect source file path: " + srcFilePath);
+		}
+	}
+
+	private void canOverwrite() throws Exception {
+		File destFile = new File(destFilePath);
+		if (!overwrite && destFile.exists()) {
+			throw new Exception("File " + destFile.getName() + " can't be overwritten");
+		}
+	}
+
 	protected static class Stopwatch {
-		LocalDateTime start;
+		Instant start;
 		
 		protected Stopwatch() {
-			start = LocalDateTime.now();
+			start = Instant.now();
 		}
 		
 		protected long getDelta() {
-			LocalDateTime finish = LocalDateTime.now();
+			Instant finish = Instant.now();
 			Duration delta = Duration.between(start, finish);
 			return delta.toMillis();
 		}

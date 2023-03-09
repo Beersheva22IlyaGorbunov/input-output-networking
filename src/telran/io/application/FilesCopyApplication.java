@@ -4,10 +4,11 @@ import telran.io.Copy;
 import telran.io.FilesCopyBuilder;
 
 public class FilesCopyApplication {
+	private final static String FILES_COPY = "FilesCopy";
+	
 	public static void main(String[] args) {
-		Copy copy;
 		try {
-			copy = new FilesCopyBuilder().build(CopyOperation.FilesCopy.toString(), args);
+			Copy copy = new FilesCopyBuilder().build(FILES_COPY, args);
 			copy.copyRun();
 		} catch (Exception e1) {
 			System.out.println(e1.getLocalizedMessage());

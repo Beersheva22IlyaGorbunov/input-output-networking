@@ -4,13 +4,14 @@ import telran.io.Copy;
 import telran.io.FilesCopyBuilder;
 
 public class TransferCopyApplication {
+	private final static String TRANSFER_COPY = "TransferCopy";
+	
 	public static void main(String[] args) {
-		Copy copy;
 		try {
-			copy = new FilesCopyBuilder().build(CopyOperation.TransferCopy.toString(), args);
+			Copy copy = new FilesCopyBuilder().build(TRANSFER_COPY, args);
 			copy.copyRun();
-		} catch (Exception e1) {
-			System.out.println(e1.getLocalizedMessage());
+		} catch (Exception e) {
+			System.out.println(e.getLocalizedMessage());
 		}
 	}
 }

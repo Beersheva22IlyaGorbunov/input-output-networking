@@ -1,8 +1,12 @@
 package telran.io;
 
-import java.io.File;
 
 public class FilesCopyBuilder {
+	private final static String FILES_COPY = "FilesCopy";
+	private final static String TRANSFER_COPY = "TransferCopy";
+	private final static String BUFFER_COPY = "BufferCopy";
+	
+	
 	public Copy build(String type, String[] args) throws Exception {
 			if (args.length < 2) {
 				throw new Exception("Invalid number of arguments");
@@ -12,25 +16,12 @@ public class FilesCopyBuilder {
 			String destFileString = args[1];
 			boolean filesOverride = getFilesOverride(args);
 			
-			File srcFilePath = new File(srcFileString);
-			File destFilePath = new File(destFileString);
-			
-			if (!srcFilePath.isFile()) {
-				throw new Exception("Incorrect file path");
+			switch (type) {
+				case (FILES_COPY): return new FilesCopy(srcFileString, destFileString, filesOverride);
+				case (TRANSFER_COPY): return new TransferCopy(srcFileString, destFileString, filesOverride);
+				case (BUFFER_COPY): return new BufferCopy(srcFileString, destFileString, filesOverride, getBufferSize(args));
+				default: throw new IllegalArgumentException(type + " is incorect for copying type");
 			}
-			
-			if (!destFilePath.exists() || filesOverride) {
-				switch (type) {
-					case ("FilesCopy"): return new FilesCopy(srcFileString, destFileString, filesOverride);
-					case ("TransferCopy"): return new TransferCopy(srcFileString, destFileString, filesOverride);
-					case ("BufferCopy"): 
-						int bufferSize = getBufferSize(args);
-						return new BufferCopy(srcFileString, destFileString, filesOverride, bufferSize);
-				}
-			} else {
-				throw new Exception("File " + destFilePath.getName() + " already exists");
-			}	
-		return null;
 	}
 	
 	private int getBufferSize(String[] args) {

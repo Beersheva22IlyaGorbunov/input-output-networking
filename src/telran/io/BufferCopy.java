@@ -16,7 +16,7 @@ public class BufferCopy extends Copy {
 	}
 
 	@Override
-	public long copy() throws IOException {
+	public long copy() {
 		File srcFilePath = new File(this.srcFilePath);
 		File destFilePath = new File(this.destFilePath);
 		
@@ -30,6 +30,8 @@ public class BufferCopy extends Copy {
 				copiedBytes += copiedSize;
 				output.write(buffer, 0, copiedSize);
 			}
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
 		}
 		return copiedBytes;
 	}

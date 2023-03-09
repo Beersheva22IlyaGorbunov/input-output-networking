@@ -14,7 +14,7 @@ public class TransferCopy extends Copy {
 	}
 
 	@Override
-	public long copy() throws IOException {
+	public long copy() {
 		File srcFilePath = new File(this.srcFilePath);
 		File destFilePath = new File(this.destFilePath);
 		
@@ -23,6 +23,8 @@ public class TransferCopy extends Copy {
 		try (InputStream input = new FileInputStream(srcFilePath);
 			 OutputStream output = new FileOutputStream(destFilePath);) {
 			copiedBytes = input.transferTo(output);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
 		}
 		return copiedBytes;
 	}

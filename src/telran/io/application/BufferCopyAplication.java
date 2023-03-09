@@ -4,11 +4,11 @@ import telran.io.Copy;
 import telran.io.FilesCopyBuilder;
 
 public class BufferCopyAplication {
+	private final static String BUFFER_COPY = "BufferCopy";
 
 	public static void main(String[] args) {
-		Copy copy;
 		try {
-			copy = new FilesCopyBuilder().build(CopyOperation.BufferCopy.toString(), args);
+			Copy copy = new FilesCopyBuilder().build(BUFFER_COPY, args);
 			copy.copyRun();
 		} catch (Exception e1) {
 			e1.printStackTrace();

@@ -12,15 +12,17 @@ public class FilesCopy extends Copy{
 	}
 
 	@Override
-	public long copy() throws IOException {
+	public long copy() {
 		Path srcFilePath = Path.of(this.srcFilePath);
 		Path destFilePath = Path.of(this.destFilePath);
-		if (overwrite) {
+		long res = 0;
+		try {
 			Files.copy(srcFilePath, destFilePath, StandardCopyOption.REPLACE_EXISTING );
-		} else {
-			Files.copy(srcFilePath, destFilePath);
+			res = Files.size(destFilePath);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
 		}
-		return Files.size(destFilePath);
+		return res;
 	}
 
 	@Override
