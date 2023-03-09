@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 public class DisplayResult {
-	protected long fileSize;
-	protected long copyTime;
+	private long fileSize;
+	private long copyTime;
 	
 	public DisplayResult(long fileSize, long copyTime) {
 		this.fileSize = fileSize;

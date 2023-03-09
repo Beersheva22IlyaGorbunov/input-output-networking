@@ -10,7 +10,7 @@ public class DisplayResultBuffer extends DisplayResult {
 	
 	@Override
 	public String toString() {
-		String res = String.format("File with size %s was succesfully copied for %s, buffer size is %s", convertSize(fileSize), convertCopyTime(), convertSize(bufferSize));
+		String res = super.toString() + String.format(", buffer size is %s",convertSize(bufferSize));
 		return res;
 	}
 }

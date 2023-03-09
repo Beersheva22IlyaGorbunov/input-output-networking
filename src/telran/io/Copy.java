@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import telran.io.Copy.Stopwatch;
+
 public abstract class Copy {
 	String srcFilePath;
 	String destFilePath;
@@ -19,7 +21,16 @@ public abstract class Copy {
 	
 	public abstract DisplayResult getDisplayResult(long copyTime, long fileSize);
 	
-	public abstract void copyRun() throws IOException;
+	public void copyRun() throws IOException {
+		System.out.println("Start copying");
+		Stopwatch stopwatch = new Stopwatch();
+		
+		long fileSize = copy();
+		long copyTime = stopwatch.getDelta();
+		
+		System.out.println("Copying succesfully finished");
+		System.out.println(getDisplayResult(copyTime, fileSize).toString());
+	}
 	
 	protected static class Stopwatch {
 		LocalDateTime start;

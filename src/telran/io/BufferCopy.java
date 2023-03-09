@@ -38,17 +38,4 @@ public class BufferCopy extends Copy {
 	public DisplayResult getDisplayResult(long copyTime, long fileSize) {
 		return new DisplayResultBuffer(fileSize, copyTime, bufferSize);
 	}
-
-	@Override
-	public void copyRun() throws IOException {
-		System.out.println("Starting copying");
-		Stopwatch stopwatch = new Stopwatch();
-		
-		long fileSize = copy();
-		long copyTime = stopwatch.getDelta();
-		
-		System.out.println("Copying succesfully finished");
-		System.out.println(getDisplayResult(copyTime, fileSize).toString());
-	}
-
 }
