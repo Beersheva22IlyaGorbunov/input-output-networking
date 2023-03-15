@@ -15,7 +15,7 @@ public class LoggerTest {
 	@Test
 	void loggerTest() throws FileNotFoundException {
 		
-		Handler handlerToConsole = new SimpleStreamHandler(new PrintStream(System.out));
+		Handler handlerToConsole = new SimpleStreamHandler(System.out);
 		Logger LOG = new Logger(handlerToConsole, "Logger");
 		
 		File errorLog = new File("errorLog.txt");
