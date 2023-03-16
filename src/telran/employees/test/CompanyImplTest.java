@@ -3,6 +3,7 @@ package telran.employees.test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -53,7 +54,10 @@ class CompanyImplTest {
 		expectedNames[0] = "Vasya";
 		expectedNames[1] = "Natasha";
 		assertEquals(2, employeesList.size());
-		assertArrayEquals(expectedNames, employeesList.stream().map(empl -> empl.getName()).toArray());
+		String [] actual = employeesList.stream().map(empl -> empl.getName()).toArray(String[]::new);
+		Arrays.sort(actual);
+		Arrays.sort(expectedNames);
+		assertArrayEquals(actual, expectedNames);
 	}
 	
 	@Test
@@ -63,7 +67,10 @@ class CompanyImplTest {
 		expectedNames[0] = "Natasha";
 		expectedNames[1] = "Petya";
 		assertEquals(2, employeesList.size());
-		assertArrayEquals(expectedNames, employeesList.stream().map(empl -> empl.getName()).toArray());
+		String[] actual = employeesList.stream().map(empl -> empl.getName()).toArray(String[]::new);
+		Arrays.sort(actual);
+		Arrays.sort(expectedNames);
+		assertArrayEquals(expectedNames, actual);
 	}
 	
 	@Test
@@ -73,7 +80,10 @@ class CompanyImplTest {
 		expectedNames[0] = "Petya";
 		expectedNames[1] = "Natasha";
 		assertEquals(2, employeesList.size());
-		assertArrayEquals(expectedNames, employeesList.stream().map(empl -> empl.getName()).toArray());
+		String[] actual = employeesList.stream().map(empl -> empl.getName()).toArray(String[]::new);
+		Arrays.sort(actual);
+		Arrays.sort(expectedNames);
+		assertArrayEquals(expectedNames, actual);
 	}
 	
 	@Test

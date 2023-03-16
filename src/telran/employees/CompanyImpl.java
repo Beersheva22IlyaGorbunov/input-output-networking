@@ -6,36 +6,28 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class CompanyImpl implements Company {
-	Map<Long, Employee> employees;
-	Map<String, LinkedList<Employee>> departmentMap;
-	List<LinkedList<Employee>> listByBirthday;
-	LinkedHashSet<Employee> employeesToIterate;
-	NavigableMap<Integer, LinkedList<Employee>> employeesSalaryTree;
+	Map<Long, Employee> employees = new HashMap<>();
+	Map<String, Set<Employee>> departmentMap = new HashMap<>();
+	Map<Integer, Set<Employee>> birthdayMap = new HashMap<>();
+	LinkedHashSet<Employee> employeesToIterate = new LinkedHashSet<>();
+	NavigableMap<Integer, Set<Employee>> employeesSalaryTree = new TreeMap<>();
 
 	
 	private static final long serialVersionUID = 1L;
-	
-	public CompanyImpl () {
-		employees = new HashMap<>();
-		departmentMap = new HashMap<>();
-		listByBirthday = new ArrayList<LinkedList<Employee>>(12);
-		employeesToIterate = new LinkedHashSet<>();
-		employeesSalaryTree = new TreeMap<>();
-		
-		for (int i = 0; i < 12; i++) {
-			listByBirthday.add(new LinkedList<Employee>());
-		}
-	}
 
 	@Override
 	public Iterator<Employee> iterator() {
@@ -44,20 +36,19 @@ public class CompanyImpl implements Company {
 
 	@Override
 	public boolean addEmployee(Employee employee) {
-		addToListInMap(employee, employee.getSalary(), employeesSalaryTree);
-		addToListInMap(employee, employee.getDepartment(), departmentMap);
-		employeesToIterate.add(employee);
-		listByBirthday.get(employee.getBirthDate().getMonthValue()).add(employee);
-		return employees.put(employee.getId(), employee) == null ? true : false;
+		boolean res = false;
+		if (employees.putIfAbsent(employee.getId(), employee) == null) {
+			addToListInMap(employee, employee.getSalary(), employeesSalaryTree);
+			addToListInMap(employee, employee.getDepartment(), departmentMap);
+			addToListInMap(employee, employee.getBirthDate().getMonthValue(), birthdayMap);
+			employeesToIterate.add(employee);	
+			res = true;
+		}
+		return res;
 	}
 	
-	private <T> void addToListInMap(Employee employee, T key, Map<T, LinkedList<Employee>> map) {
-		LinkedList<Employee> list = map.get(key);
-		if (list == null) {
-			list = new LinkedList<Employee>();
-			map.put(key, list);
-		}
-		list.add(employee);	
+	private <T> void addToListInMap(Employee employee, T key, Map<T, Set<Employee>> map) {
+		map.computeIfAbsent(key, k -> new HashSet<>()).add(employee);
 	}
 
 	@Override
@@ -66,14 +57,14 @@ public class CompanyImpl implements Company {
 		if (deleted != null) {
 			removeFromListInMap(deleted, deleted.getSalary(), employeesSalaryTree);
 			removeFromListInMap(deleted, deleted.getDepartment(), departmentMap);
+			removeFromListInMap(deleted, deleted.getBirthDate().getMonthValue(), birthdayMap);
 			employeesToIterate.remove(deleted);
-			listByBirthday.get(deleted.getBirthDate().getMonthValue()).remove(deleted);
 		}
 		return deleted;
 	}
 	
-	private <T> void removeFromListInMap(Employee employee, T key, Map<T, LinkedList<Employee>> map) {
-		LinkedList<Employee> list = map.get(key);
+	private <T> void removeFromListInMap(Employee employee, T key, Map<T, Set<Employee>> map) {
+		Set<Employee> list = map.get(key);
 		list.remove(employee);
 		if (list.size() == 0) {
 			map.remove(key);
@@ -87,19 +78,17 @@ public class CompanyImpl implements Company {
 
 	@Override
 	public List<Employee> getEmployeesByMonth(int month) {
-		return listByBirthday.get(month);
+		return new ArrayList<>(birthdayMap.getOrDefault(month, Collections.emptySet()));
 	}
 
 	@Override
 	public List<Employee> getEmployeesBySalary(int salaryFrom, int salaryTo) {
-		List<Employee> res = new ArrayList<>();
-		employeesSalaryTree.subMap(salaryFrom, true, salaryTo, true).values().forEach(set -> res.addAll(set));
-		return res;
+		return employeesSalaryTree.subMap(salaryFrom, true, salaryTo, true).values().stream().flatMap(Set::stream).toList();
 	}
 
 	@Override
 	public List<Employee> getEmployeesByDepartment(String department) {
-		return departmentMap.get(department);
+		return new ArrayList<>(departmentMap.getOrDefault(department, Collections.emptySet()));
 	}
 
 	@Override
@@ -110,7 +99,7 @@ public class CompanyImpl implements Company {
 	@Override
 	public void save(String pathName) {
 		try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(new File(pathName)));) {
-			output.writeObject(this);
+			output.writeObject(getAllEmployees());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -119,13 +108,8 @@ public class CompanyImpl implements Company {
 	@Override
 	public void restore(String pathName) {
 		try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(pathName));) {
-			CompanyImpl savedCompany = (CompanyImpl) input.readObject();
-			this.employees = savedCompany.employees;
-			this.departmentMap = savedCompany.departmentMap;
-			this.employeesSalaryTree = savedCompany.employeesSalaryTree;
-			this.employeesToIterate = savedCompany.employeesToIterate;
-			this.listByBirthday = savedCompany.listByBirthday;
-			savedCompany = null;
+			Collection<Employee> readedEmployees= (Collection<Employee>) input.readObject();
+			readedEmployees.forEach(employee -> this.addEmployee(employee));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
