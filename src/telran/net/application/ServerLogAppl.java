@@ -8,11 +8,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import telran.util.Level;
 
 public class ServerLogAppl {
 	
 	private static HashMap<String, Integer> logCounter = new HashMap<>();
-	private static final int PORT = 3001;
+	public static final int PORT = 3001;
+	public static final String TYPE_COUNTER = "COUNTER";
+	public static final String TYPE_LOG = "LOG";
+	public static final String WRONG_TYPE = "Wrong request";
+	public static final String OK = "ok";
 
 	public static void main(String[] args) throws Exception {
 		ServerSocket serverSocket = new ServerSocket(PORT);
@@ -43,31 +48,31 @@ public class ServerLogAppl {
 	}
 
 	private static String getResponse(String request) {
-		String res = "Wrong request";
+		String res = WRONG_TYPE;
 		String[] tokens = request.split("#");
 		if (tokens.length == 2) {
-			tokens[0] = tokens[0].toLowerCase();
+			tokens[0] = tokens[0].toUpperCase();
 			res = switch (tokens[0]) {
-				case("trace") -> increaseMap(tokens[0]);
-				case("debug") -> increaseMap(tokens[0]);
-				case("info") -> increaseMap(tokens[0]);
-				case("warn") -> increaseMap(tokens[0]);
-				case("error") -> increaseMap(tokens[0]);
-				case("counter") -> getCounter(tokens[1]);
+				case TYPE_LOG -> proceedLogRequest(tokens[1]);
+				case TYPE_COUNTER  -> proceedCounterRequest(tokens[1]);
 				default -> "Unsupported first argument";
 			};
 		}
 		return res;
 	}
 	
-	private static String getCounter(String key) {
-		Integer counter = logCounter.get(key);
-		return counter == null ? "0" : counter.toString();
+	private static String proceedCounterRequest(String key) {
+		return logCounter.getOrDefault(key.toUpperCase(), 0).toString();
 	}
-	
-	private static String increaseMap(String key) {
-		logCounter.merge(key, 1, (oldValue, newValue) -> oldValue + newValue);
-		return "OK";
+
+	private static String proceedLogRequest(String logRecord) {
+		Level logLevel = Level.valueOf(logRecord.split(" ")[0].toUpperCase());
+		String response = WRONG_TYPE;
+		if (logLevel != null) {
+			response = OK;
+			logCounter.merge(logLevel.toString(), 1, Integer::sum);
+		}
+		return response;
 	}
 
 }

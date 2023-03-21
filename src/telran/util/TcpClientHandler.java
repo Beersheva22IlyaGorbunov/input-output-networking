@@ -10,6 +10,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import telran.net.application.ServerLogAppl;
+import telran.net.application.ServerTcpExampleAppl;
+
 public class TcpClientHandler implements Handler {
 	private static final String HOSTNAME = "localhost";
 	private static final int PORT = 3001;
@@ -27,11 +30,11 @@ public class TcpClientHandler implements Handler {
 	@Override
 	public void publish(LoggerRecord loggerRecord) {
 		String time = getTimestampString(loggerRecord.timestamp, loggerRecord.zoneId);
-		String logLine = String.format("%s#%s: %s", loggerRecord.level.toString(), time, loggerRecord.message);
+		String logLine = String.format("%s#%s %s: %s", ServerLogAppl.TYPE_LOG,loggerRecord.level.toString(), time, loggerRecord.message);
 		output.println(logLine);
 		try {
 			String response = input.readLine();
-			if (!response.equals("OK")) {
+			if (!response.equals(ServerLogAppl.OK)) {
 				throw new Exception("Received unexpected response: " + response);
 			}
 		} catch (Exception e) {
