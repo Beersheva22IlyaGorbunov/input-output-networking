@@ -30,14 +30,13 @@ public class TcpClient implements NetworkClient {
 			output.writeObject(request);
 			Response response = (Response) input.readObject();
 			if (response.code == ResponseCode.OK) {
-				System.out.println("Response received succesfully");
 				result = (T) response.data;
 			} else {
-				throw new Exception("Received response with response code: " + response.code);
+				throw new Exception(response.data.toString());
 			}
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			throw new RuntimeException(e.getMessage());
 		}
 		return result;
 	}
