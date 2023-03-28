@@ -1,17 +1,21 @@
-package telran.employees;
+package telran.employees.net;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
+import telran.employees.Company;
+import telran.employees.Employee;
 import telran.net.NetworkClient;
 
-public class CompanyNetworkClient implements Company {
+public class CompanyNetworkProxy implements Company, Closeable {
 	private static final long serialVersionUID = 1L;
 	
 	NetworkClient client;
 	
-	public CompanyNetworkClient(NetworkClient client) {
+	public CompanyNetworkProxy(NetworkClient client) {
 		this.client = client;
 	}
 
@@ -32,7 +36,7 @@ public class CompanyNetworkClient implements Company {
 
 	@Override
 	public List<Employee> getAllEmployees() {
-		return client.send(CompanyRequestType.getAll.toString(), null);
+		return client.send(CompanyRequestType.getAll.toString(), "");
 	}
 
 	@Override
@@ -42,7 +46,7 @@ public class CompanyNetworkClient implements Company {
 
 	@Override
 	public List<Employee> getEmployeesBySalary(int salaryFrom, int salaryTo) {
-		String salaries = String.format("%s-%s", salaryFrom, salaryTo);
+		int[] salaries = {salaryFrom, salaryTo};
 		return client.send(CompanyRequestType.getBySalary.toString(), salaries);
 	}
 
@@ -64,6 +68,11 @@ public class CompanyNetworkClient implements Company {
 	@Override
 	public void restore(String pathName) {
 		client.send(CompanyRequestType.restore.toString(), pathName);
+	}
+
+	@Override
+	public void close() throws IOException {
+		client.close();
 	}
 
 }

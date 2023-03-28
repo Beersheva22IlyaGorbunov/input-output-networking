@@ -1,8 +1,8 @@
 package telran.employees.test;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
+import telran.employees.net.CompanyNetworkProxy;
 import telran.net.UdpClient;
 
 public class CompanyNetworkUdpTest extends CompanyNetworkTest {
@@ -11,12 +11,7 @@ public class CompanyNetworkUdpTest extends CompanyNetworkTest {
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		client = new UdpClient(HOSTNAME, PORT);
-	}
-	
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-		client.close();
+		company = new CompanyNetworkProxy(new UdpClient(HOSTNAME, PORT));
 	}
 
 }

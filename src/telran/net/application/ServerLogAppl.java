@@ -66,11 +66,13 @@ public class ServerLogAppl {
 	}
 
 	private static String proceedLogRequest(String logRecord) {
-		Level logLevel = Level.valueOf(logRecord.split(" ")[0].toUpperCase());
 		String response = WRONG_TYPE;
-		if (logLevel != null) {
+		try {
+			Level logLevel = Level.valueOf(logRecord.split(" ")[0].toUpperCase());
 			response = OK;
 			logCounter.merge(logLevel.toString(), 1, Integer::sum);
+		} catch (Exception e) {
+			response += " " + e.toString();
 		}
 		return response;
 	}

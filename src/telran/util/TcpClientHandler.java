@@ -38,7 +38,7 @@ public class TcpClientHandler implements Handler {
 				throw new Exception("Received unexpected response: " + response);
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			new RuntimeException(e.getMessage());
 		}
 	}
 	

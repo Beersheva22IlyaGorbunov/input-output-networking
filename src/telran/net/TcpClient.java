@@ -30,7 +30,7 @@ public class TcpClient implements NetworkClient {
 			output.writeObject(request);
 			Response response = (Response) input.readObject();
 			if (response.code == ResponseCode.OK) {
-				result = (T) response.data;
+				return result = (T) response.data;
 			} else {
 				throw new Exception(response.data.toString());
 			}
@@ -38,7 +38,6 @@ public class TcpClient implements NetworkClient {
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
-		return result;
 	}
 
 }

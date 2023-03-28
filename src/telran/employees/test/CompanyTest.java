@@ -40,7 +40,7 @@ class CompanyTest {
 	Employee empl3 = new Employee(ID3, "name", LocalDate.of(2000, MONTH2, 1), DEPARTMENT1, SALARY3);
 	Employee empl4 = new Employee(ID4, "name", LocalDate.of(2000, MONTH1, 1), DEPARTMENT2, SALARY4);
 	Employee[] employees = {empl1, empl2, empl3, empl4};
-	Company company;
+	static Company company;
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {

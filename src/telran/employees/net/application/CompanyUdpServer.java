@@ -1,5 +1,8 @@
-package telran.employees;
+package telran.employees.net.application;
 
+import telran.employees.Company;
+import telran.employees.CompanyImpl;
+import telran.employees.net.CompanyNetworkProtocol;
 import telran.net.Protocol;
 import telran.net.UdpServer;
 
