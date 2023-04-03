@@ -18,7 +18,6 @@ public class CompanyNetworkProtocol implements Protocol {
 	
 	@Override
 	public Response getResponse(Request request) {
-		Response response = null;
 		try {
 			CompanyRequestType type = CompanyRequestType.valueOf(request.type);
 			return switch (type) {
@@ -34,7 +33,7 @@ public class CompanyNetworkProtocol implements Protocol {
 				default -> new Response(ResponseCode.WRONG_REQUEST, "Unrecognisable type of request: " + request.type);
 			};
 		} catch (Exception e) {
-			return new Response(ResponseCode.WRONG_REQUEST, "Unrecognisable type of request: " + request.type);
+			return new Response(ResponseCode.WRONG_DATA, e.getMessage());
 		}
 	}
 	
