@@ -1,5 +1,8 @@
 package telran.employees.application;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import telran.employees.Company;
 import telran.employees.CompanyImpl;
 import telran.employees.application.controller.CompanyControllerItems;
@@ -12,10 +15,16 @@ public class CompanyAppl {
 private static final String FILENAME = "localCompany.data";
 	
 	static Company company;
+	static Set<String> departments = new HashSet<>();
 
 	public static void main(String[] args) throws Exception {
 		company = new CompanyImpl();
 		InputOutput io = new StandardInputOutput();
+		
+		departments.add("HR");
+		departments.add("Management");
+		departments.add("Economy");
+		departments.add("Engeneer");
 		
 		try {
 			company.restore(FILENAME);
@@ -23,9 +32,8 @@ private static final String FILENAME = "localCompany.data";
 		} catch (Exception e) {
 			io.writeLine("Can't restore company from file: " + e.getMessage());
 		}
-		
-		CompanyControllerItems controller = new CompanyControllerItems(company);
-		Menu mainMenu = controller.getMainMenu(inpOut -> {
+
+		Menu mainMenu = CompanyControllerItems.getCompanyMenu(company, departments, inpOut -> {
 			company.save(FILENAME);
 		});
 		

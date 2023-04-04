@@ -15,127 +15,137 @@ import telran.view.Item;
 import telran.view.Menu;
 
 public class CompanyControllerItems {
-	private Company company;
-	private Set<String> departments = new HashSet<>();
 	
-	public CompanyControllerItems(Company company) {
-		this.company = company;
-		departments.add("HR");
-		departments.add("Management");
-		departments.add("Economy");
-		departments.add("Engeneer");
+	private static Company company;
+	private static Set<String> departments;
+	
+	private CompanyControllerItems() {}
+	
+	public static Menu getCompanyMenu(Company company, Set<String> departments, Consumer<InputOutput> exitFunc) {
+		CompanyControllerItems.company = company;
+		CompanyControllerItems.departments = departments;
+		return getMainMenu(exitFunc);
 	}
 	
-	public Menu getMainMenu(Consumer<InputOutput> func) {
+	private static Menu getMainMenu(Consumer<InputOutput> exitFunc) {
 		return new Menu("Employees application", 
 				adminItemMenu(),
 				userItemMenu(),
-				Item.of("Exit with save", func, true),
+				Item.of("Exit with save", exitFunc, true),
 				Item.exit());
 	}
 	
-	public Item userItemMenu() {
+	private static Item userItemMenu() {
 		return new Menu("User actions", 
-				Item.of("Get all employees", io -> getAllEmployees(io)),
-				Item.of("Get employee by Id", io -> getEmployeeById(io)),
-				Item.of("Get employees by bithday month", io -> getEmployeeByMonth(io)),
-				Item.of("Get employees by deparment", io -> getEmployeeByDepart(io)),
-				Item.of("Get employees by salary", io -> getEmployeeBySalary(io)),
+				Item.of("Get all employees", CompanyControllerItems::getAllEmployees),
+				Item.of("Get employee by Id", CompanyControllerItems::getEmployeeById),
+				Item.of("Get employees by bithday month", CompanyControllerItems::getEmployeeByMonth),
+				Item.of("Get employees by deparment", CompanyControllerItems::getEmployeeByDepart),
+				Item.of("Get employees by salary", CompanyControllerItems::getEmployeeBySalary),
 				Item.exit());
 	}
 
-	private void getEmployeeBySalary(InputOutput io) {
-		int salaryFrom = io.readInt(null, null);
-		int salaryTo = io.readInt(null, null);
+	private static void getEmployeeBySalary(InputOutput io) {
+		int salaryFrom = io.readInt("Enter minimum salary", "Entered wrong salary", 0, Integer.MAX_VALUE);
+		int salaryTo = io.readInt("Enter maximum salary", "Entered wrong salary", salaryFrom, Integer.MAX_VALUE);
 		List<Employee> employees = company.getEmployeesBySalary(salaryFrom, salaryTo);
 		
 		printEmployees(io, String.format("Employees with salaries in range: %d - %d", salaryFrom, salaryTo), employees);
 	}
 
-	private void getEmployeeByDepart(InputOutput io) {
+	private static void getEmployeeByDepart(InputOutput io) {
 		String depart = readDepart(io);
 		List<Employee> employees = company.getEmployeesByDepartment(depart);
 		
 		printEmployees(io, String.format("Employees of department: %s", depart), employees);
 	}
 
-	private void getEmployeeByMonth(InputOutput io) {
+	private static void getEmployeeByMonth(InputOutput io) {
 		int month = io.readInt("Enter birthday month of employees", "Wrond date", 1, 12);
 		List<Employee> employees = company.getEmployeesByMonth(month);
 
 		printEmployees(io, String.format("Employees born in: %s", Month.of(month)), employees);
 	}
 
-	private void getAllEmployees(InputOutput io) {
+	private static void getAllEmployees(InputOutput io) {
 		List<Employee> employees = company.getAllEmployees();
 		
 		printEmployees(io, "All employees:", employees);
 	}
 	
-	private void getEmployeeById(InputOutput io) {
-		int id = readId(io);
-		Employee empl = company.getEmployee(id);
-		
-		io.writeLine("Requested employee: ");
-		printEmployee(empl, io);
+	private static void getEmployeeById(InputOutput io) {
+		Long id = readId(io, true);
+		if (id != null) {
+			Employee empl = company.getEmployee(id);
+			
+			io.writeLine("Requested employee: ");
+			printEmployee(empl, io);
+		} else {
+			io.writeLine("Employee with such id doesn't exist");
+		}
 	}
 
-	public Item adminItemMenu() {
+	private static Item adminItemMenu() {
 		return new Menu("Admin actions", 
 				Item.of("Add employee", io -> addEmployee(io)),
 				Item.of("Remove employee", io -> removeEmployee(io)),
 				Item.exit());
 	}
 	
-	private void removeEmployee(InputOutput io) {
-		int id = readId(io);
-		try {
+	private static void removeEmployee(InputOutput io) {
+		Long id = readId(io, true);
+		if (id == null) {
+			io.writeLine("User with such id doesn't exits");
+		} else {
 			Employee removed = company.removeEmployee(id);
 			io.writeLine("Removed employee: ");
 			printEmployee(removed, io);
-		} catch (Exception e) {
-			io.writeLine(String.format("User with id: %d doesn't exits", id));
-		}
-		
+		}		
 	}
 
-	private void addEmployee(InputOutput io) {
-		int id = readId(io);
-		String name = readName(io);
-		LocalDate birthday = io.readDateISO("Enter birthday of employee, format yyyy-MM-dd", "Wrong date");
-		String department = readDepart(io);
-		int salary = io.readInt("Enter salary of employee", "Wrong number");
-		
-		Employee newEmployee = new Employee(id, name, birthday, department, salary);
-		if (company.addEmployee(newEmployee)) {
-			io.writeLine("User added successfully");
-		} else {
+	private static void addEmployee(InputOutput io) {
+		Long id = readId(io, false);
+		if (id == null) {
 			io.writeLine("User with such id already exists");
+		} else {
+			String name = readName(io);
+			LocalDate birthday = io.readDateISO("Enter birthday of employee, format yyyy-MM-dd", "Wrong date");
+			String department = readDepart(io);
+			int salary = io.readInt("Enter salary of employee", "Wrong number");
+			
+			Employee newEmployee = new Employee(id, name, birthday, department, salary);
+			if (company.addEmployee(newEmployee)) {
+				io.writeLine("User added successfully");
+			} else {
+				io.writeLine("User with such id already exists");
+			}
+			printEmployee(newEmployee, io);
 		}
-		printEmployee(newEmployee, io);
 	}
 	
-	private void printEmployee(Employee empl, InputOutput io) {
+	private static void printEmployee(Employee empl, InputOutput io) {
 		io.writeLine(String.format("%d %s %s %s %d", 
 				empl.getId(), empl.getName(), empl.getBirthDate(), empl.getDepartment(), empl.getSalary()));
 	}
 	
-	private void printEmployees(InputOutput io, String message, List<Employee> employees) {
+	private static void printEmployees(InputOutput io, String message, List<Employee> employees) {
 		io.writeLine(message);
 		employees.forEach((empl) -> {
 			printEmployee(empl, io);
 		});
 	}
 	
-	private int readId(InputOutput io) {
-		return io.readInt("Enter id of employee", "Wrong number");
+	private static Long readId(InputOutput io, boolean exists) {
+		long id = io.readLong("Enter id of employee", "Wrong number", 1, Long.MAX_VALUE);
+		Employee empl = company.getEmployee(id);
+		return (empl == null && !exists) || (empl != null && exists) ? id : null;
 	}
 	
-	private String readName(InputOutput io) {
+	private static String readName(InputOutput io) {
 		return io.readString("Enter name of employee");
 	}
 
-	private String readDepart(InputOutput io) {
+	private static String readDepart(InputOutput io) {
 		return io.readStringOptions(String.format("Enter name of department from: %s", departments.stream().collect(Collectors.joining(", "))), "Entered wrong name of department", departments);
 	}
 	
