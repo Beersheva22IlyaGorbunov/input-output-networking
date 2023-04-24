@@ -4,7 +4,7 @@ import java.net.*;
 import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class TcpServer implements Runnable {
 	private Protocol protocol;
@@ -17,7 +17,8 @@ public class TcpServer implements Runnable {
 		this.port = port;
 		serverSocket = new ServerSocket(port);
 		serverSocket.setSoTimeout(5000);
-		int nThreads = Runtime.getRuntime().availableProcessors();
+//		int nThreads = Runtime.getRuntime().availableProcessors();
+		int nThreads = 2;
 		System.out.println("Number thread in Threads Pool is: " + nThreads);
 		executor = Executors.newFixedThreadPool(nThreads);
 	}
@@ -33,15 +34,13 @@ public class TcpServer implements Runnable {
 				executor.execute(serverClient);
 			} catch (SocketTimeoutException e) {
 				if (executor.isTerminated()) {
-					try {
-						executor.awaitTermination(60, TimeUnit.SECONDS);
-						isRunning = false;
-						System.out.println(LocalDateTime.now().toString() + ": Server was shutted down");
-					} catch (InterruptedException e1) {}
+					isRunning = false;
+					System.out.println(LocalDateTime.now().toString() + ": Server was shutted down");
 				}
 			} catch (Exception e) {
-					System.out.println(e.toString());
+				System.out.println(e.toString());
 			}
+			
 		}
 	}
 	

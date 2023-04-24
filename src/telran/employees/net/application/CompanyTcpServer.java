@@ -1,5 +1,6 @@
 package telran.employees.net.application;
 
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import telran.employees.Company;
@@ -32,9 +33,11 @@ public class CompanyTcpServer {
 				tcpServer.shutdown();
 				serverThread.join();
 				company.save(FILE_NAME);
+				System.out.println(LocalDateTime.now().toString() + ": Company is saved");
 				running = false;
 			}
 		}
+		System.out.println(LocalDateTime.now().toString() + ": Programm was shutted down");
 	}
 
 }
