@@ -64,4 +64,12 @@ public class Employee implements Serializable, Comparable<Employee> {
 		
 		return Long.compare(id, o.id);
 	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public void setSalary(int salary) {
+		this.salary = salary;
+	}
 }

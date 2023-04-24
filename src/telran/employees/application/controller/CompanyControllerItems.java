@@ -51,6 +51,7 @@ public class CompanyControllerItems {
 		List<Employee> employees = company.getEmployeesBySalary(salaryFrom, salaryTo);
 		
 		printEmployees(io, String.format("Employees with salaries in range: %d - %d", salaryFrom, salaryTo), employees);
+		waitingForUser(io);
 	}
 
 	private static void getEmployeeByDepart(InputOutput io) {
@@ -58,6 +59,7 @@ public class CompanyControllerItems {
 		List<Employee> employees = company.getEmployeesByDepartment(depart);
 		
 		printEmployees(io, String.format("Employees of department: %s", depart), employees);
+		waitingForUser(io);
 	}
 
 	private static void getEmployeeByMonth(InputOutput io) {
@@ -65,12 +67,14 @@ public class CompanyControllerItems {
 		List<Employee> employees = company.getEmployeesByMonth(month);
 
 		printEmployees(io, String.format("Employees born in: %s", Month.of(month)), employees);
+		waitingForUser(io);
 	}
 
 	private static void getAllEmployees(InputOutput io) {
 		List<Employee> employees = company.getAllEmployees();
 		
 		printEmployees(io, "All employees:", employees);
+		waitingForUser(io);
 	}
 	
 	private static void getEmployeeById(InputOutput io) {
@@ -83,12 +87,15 @@ public class CompanyControllerItems {
 		} else {
 			io.writeLine("Employee with such id doesn't exist");
 		}
+		waitingForUser(io);
 	}
 
 	private static Item adminItemMenu() {
 		return new Menu("Admin actions", 
 				Item.of("Add employee", io -> addEmployee(io)),
 				Item.of("Remove employee", io -> removeEmployee(io)),
+				Item.of("Update salary", io -> updateSalary(io)),
+				Item.of("Update department", io -> updateDepartment(io)),
 				Item.exit());
 	}
 	
@@ -100,7 +107,8 @@ public class CompanyControllerItems {
 			Employee removed = company.removeEmployee(id);
 			io.writeLine("Removed employee: ");
 			printEmployee(removed, io);
-		}		
+		}
+		waitingForUser(io);
 	}
 
 	private static void addEmployee(InputOutput io) {
@@ -121,6 +129,33 @@ public class CompanyControllerItems {
 			}
 			printEmployee(newEmployee, io);
 		}
+		waitingForUser(io);
+	}
+	
+	private static void updateSalary(InputOutput io) {
+		Long id = readId(io, true);
+		if (id == null) {
+			io.writeLine("User with such id doesn't exist");
+		} else {
+			int newSalary = io.readInt("Enter new salary of employee", "Wrong number");
+			
+			Employee updatedEmpl = company.updateSalary(id, newSalary);
+			printEmployee(updatedEmpl, io);
+		}
+		waitingForUser(io);
+	}
+	
+	private static void updateDepartment(InputOutput io) {
+		Long id = readId(io, true);
+		if (id == null) {
+			io.writeLine("User with such id doesn't exist");
+		} else {
+			String department = readDepart(io);
+			
+			Employee updatedEmpl = company.updateDepartment(id, department);
+			printEmployee(updatedEmpl, io);
+		}
+		waitingForUser(io);
 	}
 	
 	private static void printEmployee(Employee empl, InputOutput io) {
@@ -130,9 +165,16 @@ public class CompanyControllerItems {
 	
 	private static void printEmployees(InputOutput io, String message, List<Employee> employees) {
 		io.writeLine(message);
+		if (employees.size() == 0) {
+			io.writeLine("There are no employees yet");
+		}
 		employees.forEach((empl) -> {
 			printEmployee(empl, io);
 		});
+	}
+	
+	private static void waitingForUser(InputOutput io) {
+		io.readString("Press 'Enter' to continue");
 	}
 	
 	private static Long readId(InputOutput io, boolean exists) {

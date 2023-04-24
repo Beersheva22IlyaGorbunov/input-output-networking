@@ -11,6 +11,8 @@ public interface Company extends Iterable<Employee>, Serializable {
 	List<Employee> getEmployeesBySalary(int salaryFrom, int salaryTo);
 	List<Employee> getEmployeesByDepartment(String department);
 	Employee getEmployee(long id);
+	Employee updateSalary(long id, int salary);
+	Employee updateDepartment(long id, String department);
 	void save(String pathName);
 	void restore(String pathName);
 }

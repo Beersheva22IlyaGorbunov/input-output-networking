@@ -8,6 +8,7 @@ import java.util.List;
 
 import telran.employees.Company;
 import telran.employees.Employee;
+import telran.employees.PairId;
 import telran.net.NetworkClient;
 
 public class CompanyNetworkProxy implements Company, Closeable {
@@ -26,53 +27,63 @@ public class CompanyNetworkProxy implements Company, Closeable {
 
 	@Override
 	public boolean addEmployee(Employee employee) {
-		return client.send(CompanyRequestType.add.toString(), (Serializable) employee);
+		return client.send("addEmployee", (Serializable) employee);
 	}
 
 	@Override
 	public Employee removeEmployee(long id) {
-		return client.send(CompanyRequestType.removeEmployee.toString(), id);
+		return client.send("removeEmployee", id);
 	}
 
 	@Override
 	public List<Employee> getAllEmployees() {
-		return client.send(CompanyRequestType.getAll.toString(), "");
+		return client.send("getAllEmployees", "");
 	}
 
 	@Override
 	public List<Employee> getEmployeesByMonth(int month) {
-		return client.send(CompanyRequestType.getByMonth.toString(), month);
+		return client.send("getEmployeesByMonthBirth", month);
 	}
 
 	@Override
 	public List<Employee> getEmployeesBySalary(int salaryFrom, int salaryTo) {
 		int[] salaries = {salaryFrom, salaryTo};
-		return client.send(CompanyRequestType.getBySalary.toString(), salaries);
+		return client.send("getEmployeesBySalary", salaries);
 	}
 
 	@Override
 	public List<Employee> getEmployeesByDepartment(String department) {
-		return client.send(CompanyRequestType.getByDepart.toString(), department);
+		return client.send("getEmployeesByDepartment", department);
 	}
 
 	@Override
 	public Employee getEmployee(long id) {
-		return client.send(CompanyRequestType.getById.toString(), id);
+		return client.send("getEmployee", id);
 	}
 
 	@Override
 	public void save(String pathName) {
-		client.send(CompanyRequestType.save.toString(), pathName);
+		client.send("save", pathName);
 	}
 
 	@Override
 	public void restore(String pathName) {
-		client.send(CompanyRequestType.restore.toString(), pathName);
+		client.send("restore", pathName);
 	}
 
 	@Override
 	public void close() throws IOException {
 		client.close();
+	}
+
+	@Override
+	public Employee updateSalary(long id, int salary) {
+		return client.send("updateSalary", new PairId<>(id, salary));
+	}
+
+	@Override
+	public Employee updateDepartment(long id, String department) {
+		return client.send("updateDepartment", new PairId<>(id, department));
 	}
 
 }

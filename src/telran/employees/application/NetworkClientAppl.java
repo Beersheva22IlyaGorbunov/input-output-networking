@@ -2,6 +2,7 @@ package telran.employees.application;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Properties;
@@ -34,12 +35,6 @@ public class NetworkClientAppl {
 				
 				String[] departments = props.getProperty("departments").split(", ");
 				String database = (String) props.getProperty("database", "default.data");
-				
-				try {
-					company.restore(database);
-				} catch (Exception e) {
-					io.writeLine("Can't restore company from file: " + e.getMessage());
-				}
 				
 				Menu mainMenu = CompanyControllerItems.getCompanyMenu(company, Set.of(departments), inpOut -> {
 					company.save(database);
@@ -84,6 +79,8 @@ public class NetworkClientAppl {
 			Class<NetworkClient> clientClazz = (Class<NetworkClient>) Class.forName(BASE_PACKAGE + className);
 			Constructor<NetworkClient> constructor = clientClazz.getConstructor(String.class, int.class);
 			return constructor.newInstance(hostname, port);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException("Can't create connection class");
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
